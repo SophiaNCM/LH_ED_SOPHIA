@@ -1,6 +1,6 @@
 version: 1
 default_environment: dev
-project_id: 86f6718a-24cc-40da-971d-a0d907477607
+project_id: 4d3a3d0b-6a2a-4798-afe6-42bb36d2f825
 environments:
 - name: dev
 - name: staging
@@ -11,126 +11,107 @@ plugins:
     variant: transferwise
     pip_url: pipelinewise-tap-postgres
     config:
-      user: neondb_owner
+      user: postgres
       port: 5432
-      dbname: neondb
-      host: ep-billowing-hill-a8tjrz8v-pooler.eastus2.azure.neon.tech
+      host: localhost
+      database: challenge_indicium
+      dbname: challenge_indicium
+      schemas: public
       filter_schemas: public
-      password: npg_BHyjJa6u5mlZ
       default_replication_method: LOG_BASED
+
   - name: tap-csv
     variant: meltanolabs
     pip_url: git+https://github.com/MeltanoLabs/tap-csv.git
     config:
       files:
       - entity: categories
-        path: 
-          /home/sophia/DesafioIndicium/indicium/data/csv/public-categories/2025-01-26/public-categories.csv
+        path: E:\Desafio\indicium\data\csv\public-categories\2025-01-26\public-categories.csv
         demiliter: ','
         keys: [category_id]
       - entity: customers
-        path: 
-          /home/sophia/DesafioIndicium/indicium/data/csv/public-customers/2025-01-26/public-customers.csv
+        path: indicium/data/csv/public-customers/2025-01-26/public-customers.csv
         delimiter: ','
         keys: [customer_id]
       - entity: employee_territories
         path: 
-          /home/sophia/DesafioIndicium/indicium/data/csv/public-employee_territories/2025-01-26/public-employee_territories.csv
+          E:\Desafio\indicium\data\csv\public-employee_territories\2025-01-26\public-employee_territories.csv
         delimiter: ','
         keys: [employee_id, territory_id]
       - entity: employees
-        path: 
-          /home/sophia/DesafioIndicium/indicium/data/csv/public-employees/2025-01-26/public-employees.csv
+        path: E:\Desafio\indicium\data\csv\public-employees\2025-01-26\public-employees.csv
         delimiter: ','
         keys: [employee_id]
       - entity: order_details
         path: 
-          /home/sophia/DesafioIndicium/indicium/data/csv/public-order_details/2025-01-26/public-order_details.csv
+          E:\Desafio\indicium\data\csv\public-order_details\2025-01-26\public-order_details.csv
         delimiter: ','
         keys: [order_id, product_id]
       - entity: orders
-        path: 
-          /home/sophia/DesafioIndicium/indicium/data/csv/public-orders/2025-01-26/public-orders.csv
+        path: E:\Desafio\indicium\data\csv\public-orders\2025-01-26\public-orders.csv
         delimiter: ','
         keys: [order_id, customer_id, employee_id]
       - entity: products
-        path: 
-          /home/sophia/DesafioIndicium/indicium/data/csv/public-products/2025-01-26/public-products.csv
+        path: E:\Desafio\indicium\data\csv\public-products\2025-01-26\public-products.csv
         delimiter: ','
         keys: [product_id, supplier_id, category_id]
       - entity: region
-        path: 
-          /home/sophia/DesafioIndicium/indicium/data/csv/public-region/2025-01-26/public-region.csv
+        path: E:\Desafio\indicium\data\csv\public-region\2025-01-26\public-region.csv
         delimiter: ','
         keys: [region_id]
       - entity: shippers
-        path: 
-          /home/sophia/DesafioIndicium/indicium/data/csv/public-shippers/2025-01-26/public-shippers.csv
+        path: E:\Desafio\indicium\data\csv\public-shippers\2025-01-26\public-shippers.csv
         delimiter: ','
         keys: [shipper_id]
       - entity: suppliers
-        path: 
-          /home/sophia/DesafioIndicium/indicium/data/csv/public-suppliers/2025-01-26/public-suppliers.csv
+        path: E:\Desafio\indicium\data\csv\public-suppliers\2025-01-26\public-suppliers.csv
         delimiter: ','
         keys: [supplier_id]
       - entity: territories
         path: 
-          /home/sophia/DesafioIndicium/indicium/data/csv/public-territories/2025-01-26/public-territories.csv
+          E:\Desafio\indicium\data\csv\public-territories\2025-01-26\public-territories.csv
         delimiter: ','
         keys: [territory_id, region_id]
       - entity: us_states
-        path: 
-          /home/sophia/DesafioIndicium/indicium/data/csv/public-us_states/2025-01-26/public-us_states.csv
+        path: E:\Desafio\indicium\data\csv\public-us_states\2025-01-26\public-us_states.csv
         delimiter: ','
         keys: [state_id]
   loaders:
-  - name: target-postgres
-    variant: transferwise
-    pip_url: pipelinewise-target-postgres
-    config:
-      user: neondb_owner
-      port: 5432
-      host: ep-billowing-hill-a8tjrz8v-pooler.eastus2.azure.neon.tech
-      database: indicium_tabelas
-      default_target_schema: public
-      dbname: indicium_tabelas
   - name: target-csv
     variant: meltanolabs
     pip_url: git+https://github.com/MeltanoLabs/target-csv.git
     config:
       destination_path: indicium_output
       datestamp_format: '{datestamp}'
-  files:
-  - name: files-airflow
-    variant: meltano
-    pip_url: git+https://github.com/meltano/files-airflow.git
+
+  - name: target-postgres
+    variant: transferwise
+    pip_url: pipelinewise-target-postgres
+    config:
+      host: localhost
+      port: 5432
+      user: postgres
+      dbname: IndiciumDesafio
+      schema: public
+
+
   utilities:
-  - name: salvar_arquivos_em_pastas_util
-    namespace: salvar_arquivos_em_pastas_util
-    commands:
-      run_script:
-        args: salvar_arquivos_em_pastas.py
-        executable: python
   - name: salvarcsv_util
     namespace: salvarcsv_util
     commands:
       run_script:
         args: salvarcsv.py
         executable: python
-  - name: airflow
-    variant: apache
-    pip_url: git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.8.1
-      --constraint 
-      https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt
+  - name: salvar_arquivos_em_pastas_util
+    namespace: salvar_arquivos_em_pastas_util
+    commands:
+      run_script:
+        args: salvar_arquivos_em_pastas.py
+        executable: python
 jobs:
 - name: step_one
   tasks:
   - tap-postgres target-csv
-- name: salvar_order_details
-  tasks:
-  - salvar_arquivos_em_pastas_util:run_script
-- name: salvarCSV
-  tasks:
   - salvarcsv_util:run_script
 - name: step_two
   tasks:
@@ -138,14 +119,4 @@ jobs:
 schedules:
 - name: daily-postg-load
   interval: '@daily'
-  job: step_one
-- name: daily-salvar-order-details
-  interval: '@daily'
-  job: salvar_order_details
-- name: daily-salvar-csv
-  interval: '@daily'
-  job: salvarCSV
-- name: daily-step-two
-  interval: '@daily'
-  job: step_two
-
+  job: [step_one, step_two]

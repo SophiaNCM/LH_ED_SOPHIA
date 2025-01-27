@@ -105,17 +105,17 @@ plugins:
     variant: meltano
     pip_url: git+https://github.com/meltano/files-airflow.git
   utilities:
-  - name: salvarcsv_util
-    namespace: salvarcsv_util
-    commands:
-      run_script:
-        args: salvarcsv.py
-        executable: python
   - name: salvar_arquivos_em_pastas_util
     namespace: salvar_arquivos_em_pastas_util
     commands:
       run_script:
         args: salvar_arquivos_em_pastas.py
+        executable: python
+  - name: salvarcsv_util
+    namespace: salvarcsv_util
+    commands:
+      run_script:
+        args: salvarcsv.py
         executable: python
   - name: airflow
     variant: apache
@@ -126,7 +126,10 @@ jobs:
 - name: step_one
   tasks:
   - tap-postgres target-csv
-- name: salvar_csv
+- name: salvar_order_details
+  tasks:
+  - salvar_arquivos_em_pastas_util:run_script
+- name: salvarCSV
   tasks:
   - salvarcsv_util:run_script
 - name: step_two
@@ -136,9 +139,13 @@ schedules:
 - name: daily-postg-load
   interval: '@daily'
   job: step_one
+- name: daily-salvar-order-details
+  interval: '@daily'
+  job: salvar_order_details
 - name: daily-salvar-csv
   interval: '@daily'
-  job: salvar_csv
+  job: salvarCSV
 - name: daily-step-two
   interval: '@daily'
   job: step_two
+
